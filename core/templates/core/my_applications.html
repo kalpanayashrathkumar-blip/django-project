@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Applications</title>
+</head>
+<body>
+
+<h1>My Applications</h1>
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+
+<hr>
+
+{% if applications %}
+    {% for application in applications %}
+        <div>
+            <h2>{{ application.job.title }}</h2>
+
+            <p>
+                <strong>Company:</strong>
+                {{ application.job.company.name }}
+            </p>
+
+            <p>
+                <strong>Applied On:</strong>
+                {{ application.applied_at|date:"d M Y, H:i" }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                {{ application.status }}
+            </p>
+
+            <hr>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You have not applied for any jobs yet.</p>
+{% endif %}
+
+</body>
+</html>

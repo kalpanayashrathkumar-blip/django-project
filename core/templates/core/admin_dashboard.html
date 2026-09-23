@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1e293b;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #475569;
+        }
+
+        .stat-card p {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .management {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 600px;
+        }
+
+        .management a {
+            display: block;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+
+        .management a:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Admin Dashboard 👨‍💼</h1>
+
+<h2>System Overview</h2>
+
+<div class="stats-container">
+
+    <div class="stat-card">
+        <h3>Total Students</h3>
+        <p>{{ students_count }}</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Companies</h3>
+        <p>{{ companies_count }}</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Jobs</h3>
+        <p>{{ jobs_count }}</p>
+    </div>
+
+    <div class="stat-card">
+        <h3>Total Applications</h3>
+        <p>{{ applications_count }}</p>
+    </div>
+
+</div>
+
+<div class="management">
+
+    <h2>Quick Management</h2>
+
+    <a href="/admin/core/company/">
+        🏢 Manage Companies
+    </a>
+
+    <a href="/admin/core/jobrole/">
+        💼 Manage Job Roles
+    </a>
+
+    <a href="/admin/core/application/">
+        📋 Manage Applications
+    </a>
+
+    <a href="/admin/core/studentprofile/">
+        👨‍🎓 Manage Students
+    </a>
+
+    <a href="{% url 'dashboard' %}">
+        🏠 Student Dashboard
+    </a>
+
+    <a href="/admin/">
+        ⚙️ Django Admin Panel
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Job Listings
+{% endblock %}
+
+{% block content %}
+
+<h1>Available Job Roles</h1>
+
+{% if jobs %}
+
+    {% for job in jobs %}
+
+        <div class="card">
+
+            <h2>
+                <a href="{% url 'job_detail' job.id %}">
+                    {{ job.title }}
+                </a>
+            </h2>
+
+            <p>
+                <strong>Company:</strong>
+                {{ job.company.name }}
+            </p>
+
+            <p>
+                <strong>Minimum CGPA:</strong>
+                {{ job.minimum_cgpa }}
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No jobs available currently.</p>
+
+{% endif %}
+
+{% endblock %}

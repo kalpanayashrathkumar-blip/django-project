@@ -1,0 +1,108 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Placement Eligibility</title>
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card eligibility-header">
+        <h1>{{ job_role.company.name }}</h1>
+        <h2>{{ job_role.title }}</h2>
+    </div>
+
+
+    <!-- Eligibility Result -->
+
+    <div class="card">
+
+        <h2>Eligibility Result</h2>
+
+        {% if result.eligible %}
+
+            <div class="status eligible">
+                <h2>✅ Eligible</h2>
+                <p>You meet all current requirements.</p>
+            </div>
+
+        {% else %}
+
+            <div class="status not-eligible">
+                <h2>❌ Not Eligible</h2>
+                <p>You currently do not meet all the requirements.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- CGPA -->
+
+    <div class="card">
+
+        <h2>CGPA Requirement</h2>
+
+        {% if result.cgpa_eligible %}
+
+            <div class="requirement success">
+                ✅ CGPA requirement satisfied
+            </div>
+
+        {% else %}
+
+            <div class="requirement danger">
+                ❌ CGPA requirement not satisfied
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Skills -->
+
+    <div class="card">
+
+        <h2>Skill Requirement</h2>
+
+        {% if result.skills_eligible %}
+
+            <div class="requirement success">
+                ✅ All required skills are present
+            </div>
+
+        {% else %}
+
+            <div class="requirement danger">
+                ❌ Some skills are missing
+            </div>
+
+            <h3>Missing Skills</h3>
+
+            <ul class="missing-skills">
+                {% for skill in result.missing_skills %}
+                    <li>{{ skill }}</li>
+                {% endfor %}
+            </ul>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Back Button -->
+
+    <a class="btn" href="{% url 'job_list' %}">
+        ← Back to Jobs
+    </a>
+
+</div>
+
+</body>
+</html>

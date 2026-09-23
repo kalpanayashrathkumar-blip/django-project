@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+
+{% block title %}Job Details{% endblock %}
+
+{% block content %}
+
+<h1>{{ job.title }}</h1>
+
+<div class="card">
+    <h2>{{ job.company.name }}</h2>
+
+    <p>
+        <strong>Minimum CGPA:</strong>
+        {{ job.minimum_cgpa }}
+    </p>
+
+    {% if job.required_skills.all %}
+        <h3>Required Skills</h3>
+
+        <ul>
+            {% for skill in job.required_skills.all %}
+                <li>{{ skill.name }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Eligibility Check</h2>
+
+    <p>
+        <strong>Your CGPA:</strong>
+        {{ student.cgpa }}
+    </p>
+
+    <p>
+        <strong>Required CGPA:</strong>
+        {{ job.minimum_cgpa }}
+    </p>
+
+    {% if eligibility.cgpa_eligible %}
+        <p>✅ CGPA requirement satisfied.</p>
+    {% else %}
+        <p>❌ Your CGPA does not meet the requirement.</p>
+    {% endif %}
+
+    {% if eligibility.skills_eligible %}
+        <p>✅ You have all required skills.</p>
+    {% else %}
+        <p>❌ Some required skills are missing.</p>
+
+        <h3>Missing Skills</h3>
+
+        <ul>
+            {% for skill in eligibility.missing_skills %}
+                <li>{{ skill|title }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <hr>
+
+    {% if eligibility.eligible %}
+        <h2>✅ You are eligible for this job.</h2>
+
+        <form method="POST" action="{% url 'apply_job' job.id %}">
+            {% csrf_token %}
+            <button type="submit">Apply Now</button>
+        </form>
+    {% else %}
+        <h2>❌ You are currently not eligible.</h2>
+        <p>Please improve your CGPA or learn the missing skills.</p>
+    {% endif %}
+</div>
+
+<a href="{% url 'job_list' %}">← Back to Jobs</a>
+
+{% endblock %}
