@@ -1,8 +1,11 @@
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import StudentProfileSerializer ,CompanySerializer ,JobRoleSerializer, ApplicationSerializer
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from .models import Application
 from .models import StudentProfile, JobRole ,Project ,Company
-from .services import check_eligibility, get_dashboard_data,   get_profile_completion, get_skill_gap,  get_skill_recommendations
+from .services import check_eligibility, get_dashboard_data,   get_profile_completion, get_skill_gap,  get_skill_recommendations , calculate_job_match_score
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
@@ -13,8 +16,9 @@ from .forms import RegistrationForm ,StudentProfileForm , ProjectForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
-
+from .services import get_skill_gap, get_skill_recommendations
 from django.shortcuts import render, get_object_or_404, redirect
+from .ml_models import predict_placement
 
 def check_job_eligibility(request, job_id):
     student = get_object_or_404(
@@ -61,8 +65,11 @@ def dashboard(request):
     )
 
     dashboard_data = get_dashboard_data(student)
+    ml_prediction = predict_placement(student)
+
     profile_completion = get_profile_completion(student)
     skill_gap = get_skill_gap(student)
+   
     skill_recommendations = get_skill_recommendations(skill_gap)
     applications = Application.objects.filter(
     student=student
@@ -94,6 +101,45 @@ def dashboard(request):
             "shortlisted": shortlisted,
             "selected": selected,
             "rejected": rejected,
+            "ml_prediction": ml_prediction,
+        }
+    )
+@login_required(login_url="/login/")
+def recommended_jobs(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    jobs = (
+        JobRole.objects
+        .select_related("company")
+        .prefetch_related("required_skills")
+    )
+
+    recommendations = []
+
+    for job in jobs:
+        eligibility = check_eligibility(student, job)
+        match_score = calculate_job_match_score(student, job)
+
+        recommendations.append({
+            "job": job,
+            "match_score": match_score,
+            "eligible": eligibility["eligible"],
+            "missing_skills": eligibility["missing_skills"],
+        })
+
+    recommendations.sort(
+        key=lambda x: x["match_score"],
+        reverse=True
+    )
+
+    return render(
+        request,
+        "core/recommended_jobs.html",
+        {
+            "recommendations": recommendations
         }
     )
 def register(request):
@@ -394,4 +440,150 @@ def admin_dashboard(request):
         "jobs_count": jobs_count,
         "applications_count": applications_count,
         "students_count": students_count,
+
+
     })
+@api_view(["GET"])
+def student_api(request):
+    student = StudentProfile.objects.all()
+    serializer = StudentProfileSerializer(student, many=True)
+
+    return Response(serializer.data)
+@api_view(["GET"])
+def company_api(request):
+    companies = Company.objects.all()
+    serializer = CompanySerializer(companies, many=True)
+
+    return Response(serializer.data)
+@api_view(["GET"])
+def job_api(request):
+    jobs = JobRole.objects.all()
+    serializer = JobRoleSerializer(jobs, many=True)
+
+    return Response(serializer.data)
+@api_view(["GET"])
+@login_required(login_url="/login/")
+def eligibility_api(request, job_id):
+    job = get_object_or_404(JobRole, id=job_id)
+    student = get_object_or_404(StudentProfile, user=request.user)
+
+    eligibility = check_eligibility(student, job)
+
+    return Response(eligibility)
+@api_view(["GET"])
+@login_required(login_url="/login/")
+def application_api(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+@api_view(["GET"])
+@login_required(login_url="/login/")
+def application_api(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    applications = (
+        Application.objects
+        .filter(student=student)
+        .select_related("job", "job__company")
+    )
+
+    serializer = ApplicationSerializer(
+        applications,
+        many=True
+    )
+
+    return Response(serializer.data)
+@api_view(["GET"])
+@login_required(login_url="/login/")
+def dashboard_api(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    dashboard_data = get_dashboard_data(student)
+
+    applications = Application.objects.filter(student=student)
+
+    data = {
+        "total_jobs": dashboard_data["total_jobs"],
+        "eligible_jobs": dashboard_data["eligible_jobs"],
+        "missing_skills": dashboard_data["missing_skills"],
+        "total_applications": applications.count(),
+        "shortlisted": applications.filter(status="Shortlisted").count(),
+        "selected": applications.filter(status="Selected").count(),
+        "rejected": applications.filter(status="Rejected").count(),
+    }
+
+    return Response(data)
+
+@api_view(["GET"])
+@login_required(login_url="/login/")
+def job_recommendations_api(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    jobs = JobRole.objects.select_related(
+        "company"
+    ).prefetch_related(
+        "required_skills"
+    )
+
+    recommendations = []
+
+    for job in jobs:
+        eligibility = check_eligibility(student, job)
+        match_score = calculate_job_match_score(student, job)
+
+        recommendations.append({
+            "job_id": job.id,
+            "job_title": job.title,
+            "company": job.company.name,
+            "match_score": match_score,
+            "eligible": eligibility["eligible"],
+            "missing_skills": eligibility["missing_skills"],
+        })
+
+    recommendations.sort(
+        key=lambda x: x["match_score"],
+        reverse=True
+    )
+
+    return Response(recommendations)
+@api_view(["GET"])
+@login_required(login_url="/login/")
+def ml_prediction_api(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    prediction = predict_placement(student)
+
+    return Response(prediction)
+@login_required(login_url="/login/")
+def skill_gap_view(request):
+    student = get_object_or_404(
+        StudentProfile,
+        user=request.user
+    )
+
+    skill_gap = get_skill_gap(student)
+    recommendations = get_skill_recommendations(skill_gap)
+
+    return render(
+        request,
+        "core/skill_gap.html",
+        {
+            "skill_gap": skill_gap,
+            "recommendations": recommendations,
+        }
+    )
+  

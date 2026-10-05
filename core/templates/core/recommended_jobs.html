@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>🎯 Recommended Jobs</h2>
+    <p>Jobs are sorted by your match score.</p>
+
+    {% for item in recommendations %}
+        <div class="card mb-3 p-3">
+            <h4>{{ item.job.title }}</h4>
+
+            <p>
+                <strong>Company:</strong>
+                {{ item.job.company.name }}
+            </p>
+
+            <p>
+                <strong>Match Score:</strong>
+                {{ item.match_score }}%
+            </p>
+
+            {% if item.eligible %}
+    <p>✅ You are eligible for this job.</p>
+
+    <a href="{% url 'job_detail' item.job.id %}">
+        Apply Now
+    </a>
+            {% else %}
+                <p>❌ You are not currently eligible.</p>
+
+                {% if item.missing_skills %}
+                    <p>
+                        <strong>Missing Skills:</strong>
+                        {{ item.missing_skills|join:", " }}
+                    </p>
+                {% endif %}
+            {% endif %}
+
+            <a href="{% url 'job_detail' item.job.id %}">
+                View Job
+            </a>
+        </div>
+    {% empty %}
+        <p>No jobs available.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

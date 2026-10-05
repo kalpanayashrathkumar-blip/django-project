@@ -144,3 +144,58 @@ def get_skill_recommendations(skill_gap):
         })
 
     return result
+def calculate_job_match_score(student, job_role):
+    student_skills = set(
+        skill.name.lower()
+        for skill in student.skills.all()
+    )
+
+    required_skills = set(
+        skill.name.lower()
+        for skill in job_role.required_skills.all()
+    )
+
+    # Skill score
+    if required_skills:
+        matched_skills = student_skills & required_skills
+        skill_score = (
+            len(matched_skills) / len(required_skills)
+        ) * 100
+    else:
+        skill_score = 100
+
+    # CGPA score
+    if student.cgpa >= job_role.minimum_cgpa:
+        cgpa_score = 100
+    else:
+        cgpa_score = (
+            student.cgpa / job_role.minimum_cgpa
+        ) * 100
+
+    final_score = (
+        skill_score * 0.70
+        + cgpa_score * 0.30
+    )
+
+    return round(final_score, 2)
+def create_placement_record(student):
+    from .models import PlacementRecord, Application
+
+    skill_count = student.skills.count()
+    project_count = student.projects.count()
+    application_count = Application.objects.filter(
+        student=student
+    ).count()
+
+    record, created = PlacementRecord.objects.update_or_create(
+        student=student,
+        defaults={
+            "cgpa": student.cgpa,
+            "skill_count": skill_count,
+            "project_count": project_count,
+            "application_count": application_count,
+            "placement_status": False,
+        }
+    )
+
+    return record

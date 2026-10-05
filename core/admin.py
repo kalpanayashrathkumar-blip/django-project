@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from .models import StudentProfile, Skill , Project , Company , JobRole
-from .models import Application
+from .models import Application ,PlacementRecord
 
 from django.contrib import admin
 from .models import Application
@@ -31,3 +31,17 @@ admin.site.register(Skill)
 admin.site.register(Project)
 admin.site.register(Company)
 admin.site.register(JobRole)
+@admin.register(PlacementRecord)
+class PlacementRecordAdmin(admin.ModelAdmin):
+    list_display = (
+        "student",
+        "cgpa",
+        "skill_count",
+        "project_count",
+        "application_count",
+        "placement_status",
+        "created_at",
+    )
+
+    list_filter = ("placement_status",)
+    search_fields = ("student__user__username",)

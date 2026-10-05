@@ -43,10 +43,12 @@
                 <a href="{% url 'add_project' %}">
                     ➕ Add Project
                 </a>
+                <a href="{% url 'recommended_jobs' %}">Recommended Jobs</a>
 
                 <a href="{% url 'my_applications' %}">
                     📋 My Applications
                 </a>
+                <a href="{% url 'skill_gap_view' %}">Skill Gap</a>
 
                 <form method="POST"
                       action="{% url 'logout' %}"

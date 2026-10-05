@@ -81,4 +81,42 @@ path(
     views.admin_dashboard,
     name="admin_dashboard"
 ),
+path("api/students/", views.student_api, name="student_api"),
+path("api/companies/", views.company_api, name="company_api"),
+path("api/jobs/", views.job_api, name="job_api"),
+path(
+    "api/jobs/<int:job_id>/eligibility/",
+    views.eligibility_api,
+    name="eligibility_api",
+),
+path(
+    "api/applications/",
+    views.application_api,
+    name="application_api",
+),
+path(
+    "api/dashboard/",
+    views.dashboard_api,
+    name="dashboard_api",
+),
+path(
+    "api/recommendations/",
+    views.job_recommendations_api,
+    name="job_recommendations_api",
+),
+path(
+    "api/ml/predict/",
+    views.ml_prediction_api,
+    name="ml_prediction_api"
+),
+path(
+    "recommended-jobs/",
+    views.recommended_jobs,
+    name="recommended_jobs",
+),
+path(
+    "skill-gap/",
+    views.skill_gap_view,
+    name="skill_gap_view",
+),
 ]

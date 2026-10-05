@@ -301,7 +301,18 @@
         View Available Jobs
     </a>
 </div>  
-    
+<div>
+    <h3>🤖 ML Placement Prediction</h3>
+
+    {% if ml_prediction.placement_prediction %}
+        <p>Placement Prediction: <strong>Placed</strong></p>
+    {% else %}
+        <p>Placement Prediction: <strong>Not Placed</strong></p>
+    {% endif %}
+
+    <p>Confidence: {{ ml_prediction.confidence }}%</p>
+    <p>Model Accuracy: {{ ml_prediction.model_accuracy }}%</p>
+</div>    
 
 <hr>
 
@@ -332,6 +343,7 @@
 {% endfor %}
     </div>
 {% endblock %}
+
 <nav class="navbar">
     <div class="nav-brand">
         Campus Placement System

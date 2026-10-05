@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Skill(models.Model):
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=100)
@@ -92,4 +93,21 @@ class Application(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.user.username} - {self.job.title}"      
+        return f"{self.student.user.username} - {self.job.title}"    
+class PlacementRecord(models.Model):
+    student = models.ForeignKey(
+        StudentProfile,
+        on_delete=models.CASCADE
+    )
+    cgpa = models.FloatField()
+    skill_count = models.IntegerField(default=0)
+    project_count = models.IntegerField(default=0)
+    application_count = models.IntegerField(default=0)
+
+    placement_status = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.user.username} - {self.placement_status}" 
+    

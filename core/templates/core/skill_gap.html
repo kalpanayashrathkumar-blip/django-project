@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>🧠 Skill Gap Analysis</h2>
+
+    {% if skill_gap %}
+        <p>Ye skills add karne se aur job roles ke liye eligibility improve ho sakti hai:</p>
+
+        {% for skill in skill_gap %}
+            <div class="card mb-3 p-3">
+                <h4>{{ skill|title }}</h4>
+            </div>
+        {% endfor %}
+
+        <h3>📚 Learning Recommendations</h3>
+
+        {% for item in recommendations %}
+            <div class="card mb-3 p-3">
+                <h4>{{ item.skill|title }}</h4>
+                <p><strong>Why:</strong> {{ item.reason }}</p>
+                <p><strong>What to do:</strong> {{ item.action }}</p>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <p>🎉 No major skill gaps found!</p>
+    {% endif %}
+</div>
+
+{% endblock %}
