@@ -1,35 +1,54 @@
 {% extends "core/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-    
-    <link rel="stylesheet" href="{% static 'core/style.css' %}">
-</head>
+
 
 
 {% block title %}Dashboard{% endblock %}
 {% block content %}
     <div class="container">
 
-    <h1>Welcome, {{ student.user.username }} 👋</h1>
-    {% if student.profile_photo %}
-    <div class="profile-photo-container">
-        <img
-            src="{{ student.profile_photo.url }}"
-            alt="Profile Photo"
-            class="profile-photo"
-             width="150"
-        height="150"
-        style="border-radius: 50%; object-fit: cover;">
-    </div>
-{% else %}
-    <p>No profile photo uploaded yet.</p>
-{% endif %}
-    <hr>
+   <div class="dashboard-hero">
 
-    <h2> My Profile</h2>
+    <div class="hero-content">
+
+        <div class="hero-text">
+            <span class="hero-label">🎓 Student Dashboard</span>
+
+            <h1>
+                Welcome, {{ student.user.username }} 👋
+            </h1>
+
+            <p>
+                Track your placement journey, discover opportunities
+                and build the skills you need for your dream career.
+            </p>
+
+            <div class="hero-badges">
+                <span>✨ Profile Dashboard</span>
+                <span>🚀 Career Growth</span>
+            </div>
+        </div>
+
+        <div class="hero-photo">
+            {% if student.profile_photo %}
+                <img
+                    src="{{ student.profile_photo.url }}"
+                    alt="Profile Photo"
+                    class="profile-photo">
+            {% else %}
+                <div class="hero-placeholder">
+                    👤
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="dashboard-section profile-section">
+    <h2>👤 My Profile</h2>
+
     <div class="card">
 
     <p>
@@ -51,13 +70,16 @@
         <strong>CGPA:</strong>
         {{ student.cgpa }}
     </p>
+   </div>
+ 
+</div>  
+   
 
-    <hr>
-    <hr>
-<hr>
-<h2>Profile Completion</h2>
+<div class="dashboard-section completion-section">
 
-<div class="card">
+    <h2>📊 Profile Completion</h2>
+
+    <div class="card">
 
     <div class="completion-header">
         <strong>Profile Progress</strong>
@@ -87,32 +109,72 @@
             Complete Your Profile
         </a>
     {% endif %}
+</div>
+</div>
+</div>
+<div class="dashboard-section resume-section">
+
+    <h2>📄 My Resume</h2>
+
+    <div class="card resume-card">
+
+        {% if student.resume %}
+
+            <div class="resume-icon">
+                📄
+            </div>
+
+            <h3>Resume Uploaded</h3>
+
+            <p>
+                Your resume is ready to view or download.
+            </p>
+
+            <div class="resume-actions">
+
+                <a
+                    class="btn"
+                    href="{{ student.resume.url }}"
+                    target="_blank">
+                    👁️ View Resume
+                </a>
+
+                <a
+                    class="btn resume-download"
+                    href="{{ student.resume.url }}"
+                    download>
+                    ⬇️ Download Resume
+                </a>
+
+            </div>
+
+        {% else %}
+
+            <div class="resume-icon">
+                📄
+            </div>
+
+            <h3>No Resume Uploaded</h3>
+
+            <p>
+                Upload your resume to complete your placement profile.
+            </p>
+
+            <a class="btn" href="{% url 'edit_profile' %}">
+                📤 Upload Resume
+            </a>
+
+        {% endif %}
+
+    </div>
 
 </div>
-<h2>My Resume</h2>
 
-{% if student.resume %}
-    <p>Resume uploaded successfully.</p>
+<div class="dashboard-section stats-section">
 
-    <a href="{{ student.resume.url }}" target="_blank">
-        View Resume
-    </a>
+    <h2>📈 Application Statistics</h2>
 
-    <br><br>
-
-    <a href="{{ student.resume.url }}" download>
-        Download Resume
-    </a>
-{% else %}
-    <p>No resume uploaded yet.</p>
-
-    <a href="{% url 'edit_profile' %}">
-        Upload Resume
-    </a>
-{% endif %}
-<h2>Application Statistics</h2>
-
-<div class="stats-container">
+    <div class="stats-container">
 
     <div class="stat-card">
         <h3>Total Applications</h3>
@@ -133,240 +195,304 @@
         <h3>Rejected</h3>
         <p>{{ rejected }}</p>
     </div>
-
 </div>
-<h2>Placement Overview</h2>
+</div>
+<div class="dashboard-section placement-section">
 
-<p>
-    <strong>Total Jobs:</strong>
-    {{ dashboard_data.total_jobs }}
-</p>
+    <h2>🎯 Placement Overview</h2>
 
-<p>
-    <strong>Eligible Jobs:</strong>
-    {{ dashboard_data.eligible_jobs }}
-</p>
-
-<h3>Skills You May Need</h3>
-
-<ul>
-    {% for skill in dashboard_data.missing_skills %}
-        <li>{{ skill }}</li>
-    {% empty %}
-        <li>No missing skills found 🎉</li>
-    {% endfor %}
-</ul>
-
-    <h2> My Skills</h2>
     <div class="card">
-    <ul>
-        {% for skill in student.skills.all %}
-            <li>{{ skill.name }} — {{ skill.category }}</li>
-        {% empty %}
-            <li>No skills added yet.</li>
-        {% endfor %}
-    </ul>
 
+        <div class="placement-stats">
+            <div class="placement-item">
+                <span>Total Jobs</span>
+                <strong>{{ dashboard_data.total_jobs }}</strong>
+            </div>
 
-    <hr>
-    </div>
-<!-- Skill Gap Analysis -->
+            <div class="placement-item eligible-item">
+                <span>Eligible Jobs</span>
+                <strong>{{ dashboard_data.eligible_jobs }}</strong>
+            </div>
+        </div>
 
-<h2>Skill Gap Analysis</h2>
+        <h3>💡 Skills You May Need</h3>
 
-<div class="card">
-
-    {% if skill_gap %}
-
-        <p>
-            The following skills may help you qualify for more job roles:
-        </p>
-
-        <div class="skills-container">
-            {% for skill in skill_gap %}
-                <span class="skill missing-skill">
-                    {{ skill|title }}
-                </span>
+        <ul class="missing-skills">
+            {% for skill in dashboard_data.missing_skills %}
+                <li>{{ skill|title }}</li>
+            {% empty %}
+                <li>No missing skills found 🎉</li>
             {% endfor %}
-        </div>
-
-    {% else %}
-
-        <div class="requirement success">
-            🎉 No major skill gaps detected!
-        </div>
-
-    {% endif %}
-
-</div> 
-<!-- Skill Recommendations -->
-
-<h2>Skill Recommendations</h2>
-
-<div class="card">
-
-    {% if recommendations %}
-
-        <ul class="recommendations-list">
-           <h2>Skill Recommendations</h2>
-
-<div class="recommendations-container">
-
-    {% for recommendation in recommendations %}
-        <div class="recommendation-card">
-
-            <h3>{{ recommendation.skill|title }}</h3>
-
-            <p>
-                <strong>Why:</strong>
-                {{ recommendation.reason }}
-            </p>
-
-            <p>
-                <strong>What to do:</strong>
-                {{ recommendation.action }}
-            </p>
-
-        </div>
-    {% empty %}
-        <p>No recommendations available.</p>
-    {% endfor %}
-
-</div>
         </ul>
 
-    {% else %}
+    </div>
 
-        <p>No recommendations available currently.</p>
+</div>
+<div class="dashboard-section skills-section">
 
-    {% endif %}
+    <h2>🛠️ My Skills</h2>
 
-</div>   
-<h2>My Projects</h2>
+    <div class="card">
 
-<div class="projects-container">
+        {% if student.skills.all %}
+            <div class="my-skills-list">
+                {% for skill in student.skills.all %}
+                    <span class="my-skill">
+                        {{ skill.name }}
+                    </span>
+                {% empty %}
+                    <p>No skills added yet.</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No skills added yet.</p>
+        {% endif %}
 
-    {% for project in student.projects.all %}
+    </div>
 
-        <div class="project-card">
+</div>
+    
+<!-- Skill Gap Analysis -->
+<div class="dashboard-section skill-gap-section">
 
-            <h3>{{ project.title }}</h3>
+    <h2>🧠 Skill Gap Analysis</h2>
 
-            <p>{{ project.description }}</p>
+    <div class="card">
+
+        {% if skill_gap %}
 
             <p>
-                <strong>Technologies:</strong>
-                {{ project.technologies }}
+                The following skills may help you qualify for more job roles:
             </p>
 
-            {% if project.github_link %}
-                <a href="{{ project.github_link }}" target="_blank">
-                    View GitHub Project
-                </a>
-            {% endif %}
+            <div class="skills-container">
+                {% for skill in skill_gap %}
+                    <span class="skill missing-skill">
+                        {{ skill|title }}
+                    </span>
+                {% endfor %}
+            </div>
 
-            <div class="project-actions">
-                <a class="btn" href="{% url 'edit_project' project.id %}">
-                    Edit
-                </a>
+        {% else %}
 
-                <a class="btn btn-danger"
-                   href="{% url 'delete_project' project.id %}">
-                    Delete
-                </a>
+            <div class="requirement success">
+                🎉 No major skill gaps detected!
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+<!-- Skill Recommendations -->
+<div class="dashboard-section recommendations-section">
+
+    <h2>💡 Skill Recommendations</h2>
+
+    <div class="recommendations-container">
+
+        {% for recommendation in recommendations %}
+
+            <div class="recommendation-card">
+
+                <h3>{{ recommendation.skill|title }}</h3>
+
+                <p>
+                    <strong>Why:</strong>
+                    {{ recommendation.reason }}
+                </p>
+
+                <p>
+                    <strong>What to do:</strong>
+                    {{ recommendation.action }}
+                </p>
+
+            </div>
+
+        {% empty %}
+
+            <div class="card">
+                <p>No recommendations available currently.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+<div class="dashboard-section projects-section">
+
+    <h2>🚀 My Projects</h2>
+
+    <div class="projects-container">
+
+        {% for project in student.projects.all %}
+
+            <div class="project-card">
+
+                <div class="project-icon">💻</div>
+
+                <h3>{{ project.title }}</h3>
+
+                <p>{{ project.description }}</p>
+
+                <p>
+                    <strong>Technologies:</strong>
+                    {{ project.technologies }}
+                </p>
+
+                {% if project.github_link %}
+                    <a href="{{ project.github_link }}" target="_blank">
+                        🔗 View GitHub Project
+                    </a>
+                {% endif %}
+
+                <div class="project-actions">
+
+                    <a class="btn" href="{% url 'edit_project' project.id %}">
+                        ✏️ Edit
+                    </a>
+
+                    <a class="btn btn-danger"
+                       href="{% url 'delete_project' project.id %}">
+                        🗑️ Delete
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="card">
+                <p>No projects added yet.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    <a class="btn" href="{% url 'add_project' %}">
+        ➕ Add New Project
+    </a>
+
+</div>
+
+<div class="dashboard-section jobs-section">
+
+    <h2>💼 Job Opportunities</h2>
+
+    <div class="card">
+
+        <div class="jobs-icon">
+            🚀
+        </div>
+
+        <h3>Find Your Next Opportunity</h3>
+
+        <p>
+            Explore available companies and job roles
+            according to your skills and eligibility.
+        </p>
+
+        <a class="btn" href="{% url 'job_list' %}">
+            🔎 View Available Jobs
+        </a>
+
+    </div>
+
+</div>
+<div class="dashboard-section ml-section">
+
+    <h2>🤖 ML Placement Prediction</h2>
+
+    <div class="ml-card">
+
+        <div class="ml-icon">
+            🤖
+        </div>
+
+        {% if ml_prediction.placement_prediction %}
+
+            <div class="prediction-badge placed">
+                ✅ Placement Predicted
+            </div>
+
+            <h3>Great! You have a positive placement prediction.</h3>
+
+        {% else %}
+
+            <div class="prediction-badge not-placed">
+                📊 Improvement Recommended
+            </div>
+
+            <h3>Keep improving your skills and profile.</h3>
+
+        {% endif %}
+
+        <div class="ml-stats">
+
+            <div class="ml-stat">
+                <span>Confidence</span>
+                <strong>{{ ml_prediction.confidence }}%</strong>
+            </div>
+
+            <div class="ml-stat">
+                <span>Model Accuracy</span>
+                <strong>{{ ml_prediction.model_accuracy }}%</strong>
             </div>
 
         </div>
 
-    {% empty %}
+        <p class="ml-note">
+            Prediction is based on your CGPA, skills, projects and applications.
+        </p>
 
-        <p>No projects added yet.</p>
-
-    {% endfor %}
+    </div>
 
 </div>
 
-<a class="btn" href="{% url 'add_project' %}">
-    Add New Project
-</a>
-<h2>Job Opportunities</h2>
 
-<div class="card">
-    <p>
-        Explore available companies and job roles
-        according to your skills and eligibility.
-    </p>
 
-    <a class="btn" href="{% url 'job_list' %}">
-        View Available Jobs
-    </a>
-</div>  
-<div>
-    <h3>🤖 ML Placement Prediction</h3>
 
-    {% if ml_prediction.placement_prediction %}
-        <p>Placement Prediction: <strong>Placed</strong></p>
-    {% else %}
-        <p>Placement Prediction: <strong>Not Placed</strong></p>
-    {% endif %}
+<div class="dashboard-section learning-section">
 
-    <p>Confidence: {{ ml_prediction.confidence }}%</p>
-    <p>Model Accuracy: {{ ml_prediction.model_accuracy }}%</p>
-</div>    
+    <h2>📚 Learning Recommendations</h2>
 
-<hr>
+    <div class="learning-container">
 
-<h2>Learning Recommendations</h2>
+        {% for recommendation in recommendations %}
 
-{% for recommendation in recommendations %}
+            <div class="learning-card">
 
-    <div>
-        <h3>{{ recommendation.skill }}</h3>
+                <div class="learning-icon">🎓</div>
 
-        <p>
-            <strong>Why:</strong>
-            {{ recommendation.reason }}
-        </p>
+                <h3>{{ recommendation.skill }}</h3>
 
-        <p>
-            <strong>What to do:</strong>
-            {{ recommendation.action }}
-        </p>
+                <p>
+                    <strong>Why:</strong>
+                    {{ recommendation.reason }}
+                </p>
+
+                <p>
+                    <strong>What to do:</strong>
+                    {{ recommendation.action }}
+                </p>
+
+            </div>
+
+        {% empty %}
+
+            <div class="card">
+                <p>🎉 No recommendations right now.</p>
+            </div>
+
+        {% endfor %}
+
     </div>
 
-    <hr>
-
-{% empty %}
-
-    <p>🎉 No recommendations right now.</p>
-
-{% endfor %}
-    </div>
+</div>
 {% endblock %}
 
-<nav class="navbar">
-    <div class="nav-brand">
-        Campus Placement System
-    </div>
 
-    <div class="nav-links">
-        <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
-
-        <a href="{% url 'edit_profile' %}">👤 Edit Profile</a>
-
-        <a href="{% url 'job_list' %}">💼 Jobs</a>
-
-        <a href="{% url 'add_project' %}">➕ Add Project</a>
-        <a href="{% url 'my_applications' %}">
-    📋 My Applications
-</a>
-
-       <form method="POST" action="{% url 'logout' %}" style="display: inline;">
-    {% csrf_token %}
-    <button type="submit" class="nav-logout">
-        🚪 Logout
-    </button>
-</form>
-    </div>
-</nav>
 </html>
